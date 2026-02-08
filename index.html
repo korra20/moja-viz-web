@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moja Vizitka</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.6);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 400px; 
+            perspective: 1000px;
+        }
+
+        /* Glass Card Style */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            padding: 40px 30px;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Decorative blobs behind the profile */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: var(--primary);
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        .content-wrapper { position: relative; z-index: 1; }
+
+        .profile-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 { margin: 10px 0 5px; font-weight: 600; color: var(--dark); letter-spacing: -0.5px; }
+        
+        #display-job {
+            color: var(--primary);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+        }
+
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        .contact-item i {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .contact-item span { font-size: 0.9rem; color: #475569; word-break: break-all;}
+
+        /* QR Section */
+        .qr-section {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.03);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        #qrcode img { margin: 0 auto; display: block; }
+        
+        .scan-hint {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            transform: translateY(0);
+        }
+
+        button:active { transform: translateY(2px); }
+
+        .btn-edit {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px dashed #cbd5e1;
+            margin-top: 10px;
+        }
+
+        .btn-edit:hover { border-color: var(--primary); color: var(--primary); }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-save:hover { box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
+
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+        
+        .btn-logout:hover { opacity: 1; }
+
+        /* Editor Panel */
+        .editor {
+            display: none;
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: left;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .editor h3 { margin-top: 0; color: var(--dark); font-size: 1.1rem; }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="card-view" class="card">
+        <div class="content-wrapper">
+            <div class="profile-wrapper">
+                <img id="display-img" src="https://via.placeholder.com/120" alt="Profil" class="profile-img">
+            </div>
+            
+            <h2 id="display-name">Tvoje Meno</h2>
+            <div id="display-job">Tvoja Pozícia</div>
+            
+            <div class="contact-list">
+                <div class="contact-item" onclick="window.location.href='tel:'+document.getElementById('display-phone').innerText">
+                    <i class="fas fa-phone"></i>
+                    <span id="display-phone">---</span>
+                </div>
+                <div class="contact-item" onclick="window.location.href='mailto:'+document.getElementById('display-email').innerText">
+                    <i class="fas fa-envelope"></i>
+                    <span id="display-email">---</span>
+                </div>
+            </div>
+
+            <div class="qr-section">
+                <span class="scan-hint">Naskenuj pre uloženie</span>
+                <div id="qrcode"></div>
+            </div>
+            
+            <button id="login-trigger" class="btn-edit"><i class="fas fa-cog"></i> Upraviť vizitku</button>
+            <button id="logout-btn" class="hidden btn-logout" onclick="location.reload()">Ukončiť úpravy</button>
+        </div>
+    </div>
+
+    <div id="editor-view" class="editor">
+        <h3><i class="fas fa-pen-fancy"></i> Nastavenia</h3>
+        <label style="font-size: 0.8rem; color: #64748b; margin-left: 5px;">Osobné údaje</label>
+        <input type="text" id="input-name" placeholder="Meno a priezvisko">
+        <input type="text" id="input-job" placeholder="Firma / Pozícia">
+        
+        <label style="font-size: 0.8rem; color: #64748b; margin-left: 5px; margin-top: 10px; display:block;">Kontakt</label>
+        <input type="text" id="input-phone" placeholder="Telefón (+421...)">
+        <input type="email" id="input-email" placeholder="E-mail">
+        
+        <label style="font-size: 0.8rem; color: #64748b; margin-left: 5px; margin-top: 10px; display:block;">Obrázok (URL)</label>
+        <input type="text" id="input-img" placeholder="https://...">
+        
+        <div style="height: 15px;"></div>
+        <button class="btn-save" onclick="saveData()">Uložiť zmeny</button>
+    </div>
+</div>
+
+<script>
+    // QR Code Config
+    let qr = new QRCode(document.getElementById("qrcode"), {
+        width: 140,
+        height: 140,
+        colorDark : "#1e293b",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+
+    // Generate VCard
+    function generateVCardQR(data) {
+        const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:${data.name}
+ORG:${data.job}
+TEL:${data.phone}
+EMAIL:${data.email}
+END:VCARD`;
+        
+        qr.clear(); 
+        qr.makeCode(vcard);
+    }
+
+    // Save Data
+    function saveData() {
+        const data = {
+            name: document.getElementById('input-name').value,
+            job: document.getElementById('input-job').value,
+            phone: document.getElementById('input-phone').value,
+            email: document.getElementById('input-email').value,
+            img: document.getElementById('input-img').value
+        };
+
+        localStorage.setItem('userVizitkaQR_v2', JSON.stringify(data));
+        updateUI(data);
+        
+        // Visual feedback button
+        const btn = document.querySelector('.btn-save');
+        const originalText = btn.innerText;
+        btn.innerText = "Uložené! ✓";
+        btn.style.background = "#10b981";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "linear-gradient(135deg, var(--primary), var(--secondary))";
+            // Optional: Close editor automatically
+            // document.getElementById('editor-view').style.display = 'none';
+            // document.getElementById('login-trigger').classList.remove('hidden');
+        }, 1500);
+    }
+
+    // Update UI Elements
+    function updateUI(data) {
+        if(!data) return;
+        document.getElementById('display-name').innerText = data.name || "Vaše Meno";
+        document.getElementById('display-job').innerText = data.job || "VAŠA POZÍCIA";
+        document.getElementById('display-phone').innerText = data.phone || "+421 900 000 000";
+        document.getElementById('display-email').innerText = data.email || "email@domena.sk";
+        
+        if(data.img && data.img.length > 5) {
+            document.getElementById('display-img').src = data.img;
+        } else {
+            // Default placeholder if no image
+             document.getElementById('display-img').src = "https://ui-avatars.com/api/?name=" + (data.name || "User") + "&background=6366f1&color=fff";
+        }
+
+        // Fill inputs
+        document.getElementById('input-name').value = data.name || "";
+        document.getElementById('input-job').value = data.job || "";
+        document.getElementById('input-phone').value = data.phone || "";
+        document.getElementById('input-email').value = data.email || "";
+        document.getElementById('input-img').value = data.img || "";
+
+        generateVCardQR(data);
+    }
+
+    // Edit Mode Toggle
+    document.getElementById('login-trigger').addEventListener('click', () => {
+        const pass = prompt("Zadajte heslo pre úpravu (admin123):");
+        if(pass === "admin123") {
+            const editor = document.getElementById('editor-view');
+            editor.style.display = 'block';
+            editor.scrollIntoView({behavior: "smooth"});
+            
+            document.getElementById('login-trigger').classList.add('hidden');
+            document.getElementById('logout-btn').classList.remove('hidden');
+        } else {
+            alert("Nesprávne heslo!");
+        }
+    });
+
+    // Init
+    window.onload = () => {
+        const saved = JSON.parse(localStorage.getItem('userVizitkaQR_v2'));
+        if(saved) {
+            updateUI(saved);
+        } else {
+            // Initial State
+            generateVCardQR({
+                name: "Vaše Meno", 
+                job: "Pozícia", 
+                phone: "+421 900 000 000", 
+                email: "email@domena.sk"
+            });
+             document.getElementById('display-img').src = "https://ui-avatars.com/api/?name=User&background=6366f1&color=fff";
+        }
+    };
+</script>
+
+</body>
+</html>
